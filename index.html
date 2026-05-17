@@ -178,6 +178,111 @@ button,
 .light-mode #notesTitle{
   color:#555555;
 }
+#signalBox{
+  padding:4px 10px;
+  border-radius:10px;
+  font-weight:600;
+  transition:all .25s ease;
+}
+
+.dark-mode #signalBox{
+  background:#1e1e1e;
+  color:#ffffff;
+  border:1px solid #4b5563;
+}
+
+.light-mode #signalBox{
+  background:#ffffff;
+  color:#111111;
+  border:1px solid #cfcfcf;
+}
+
+#m15Box{
+  margin-top:8px;
+  margin-bottom:4px;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  font-size:14px;
+  font-weight:600;
+}
+
+#m15Label,
+#m15Timer{
+  transition:color .25s ease;
+}
+
+.dark-mode #m15Label,
+.dark-mode #m15Timer{
+  color:#f1f1f1;
+}
+
+.light-mode #m15Label,
+.light-mode #m15Timer{
+  color:#111111;
+}
+.time-box{
+  padding:10px;
+  border-radius:18px;
+
+  width:calc(100% - 0px);
+  margin:auto;
+}
+
+.dark-mode .time-box{
+  background:#181818;
+  border:1px solid #343434;
+}
+
+.light-mode .time-box{
+  background:#ffffff;
+  border:1px solid #dddddd;
+}
+
+.dark-mode .time-info{
+  color:#f1f1f1;
+}
+
+.light-mode .time-info{
+  color:#111111;
+}
+.time-bar{
+  width:100%;
+  height:10px;
+  border-radius:99px;
+  overflow:hidden;
+  background:#2a2a2a;
+  margin-bottom:8px;
+}
+
+.light-mode .time-bar{
+  background:#e5e5e5;
+}
+
+.time-fill{
+  height:100%;
+  border-radius:99px;
+  transition:width 1s linear;
+}
+
+.time-green{
+  background:#22c55e;
+}
+
+.time-yellow{
+  background:#eab308;
+}
+
+.time-red{
+  background:#ef4444;
+}
+
+.time-info{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  font-weight:600;
+}
   </style>
 </head>
 
@@ -246,10 +351,20 @@ class="light-mode min-h-screen flex items-center justify-center p-4">
       id="buttons"
       class="grid grid-cols-4 gap-3 p-5">
     </div>
-    
+
 <!-- INFINITY NOTES -->
 <div class="px-5 pb-5">
+<div id="m15Box">
+  <span id="m15Label">M15</span>
 
+  <button id="signalBox">
+    [--]
+  </button>
+
+  <span id="m15Timer">
+    10:00
+  </span>
+</div>    
   <div id="notesTitle"
   class="text-xs font-semibold opacity-70 mb-2">
     CATATAN !geser
@@ -274,11 +389,21 @@ class="light-mode min-h-screen flex items-center justify-center p-4">
     
   </div>
 
+<div id="timeBars"
+class="time-slider mt-2"></div>
 </div>
 
-  </div>
-
 <script>
+let m15Duration = 10 * 60;
+let timeLeft = m15Duration;
+
+let signalLocked = false;
+
+const signalBox =
+document.getElementById('signalBox');
+
+const timerText =
+document.getElementById('m15Timer');
 
 const body = document.getElementById('body');
 const calculator = document.getElementById('calculator');
@@ -310,6 +435,179 @@ const titleText = document.getElementById('titleText');
 const infoText = document.getElementById('infoText');
 const hasilText =
 document.getElementById('hasilText');
+const timeBars =
+document.getElementById('timeBars');
+
+function getTimerData(totalMinutes){
+
+  const now = new Date();
+
+  const minutes =
+  now.getMinutes();
+
+  const seconds =
+  now.getSeconds();
+
+  const totalSeconds =
+  totalMinutes * 60;
+
+  const passed =
+  (
+    (minutes % totalMinutes) * 60
+  ) + seconds;
+
+  const remain =
+  totalSeconds - passed;
+
+  const percent =
+  (remain / totalSeconds) * 100;
+
+  const mm =
+  Math.floor(remain / 60);
+
+  const ss =
+  remain % 60;
+
+  return {
+    remainText:
+    `${mm}:${ss
+      .toString()
+      .padStart(2,'0')}`,
+    percent
+  };
+
+}
+
+function renderTimeBars(){
+
+  const markerLabels = [
+  'J1',
+  'M15',
+  'M5',
+  'M0',
+  'M1',
+  'M2',
+  'M3'
+];
+  const nums =
+  expression.value
+  .split(/[÷×+\-]/g)
+  .filter(v => v !== '');
+
+  timeBars.innerHTML = '';
+
+  nums.forEach((num,index)=>{
+
+    let data;
+
+    if(index === 0){
+
+      data = getTimerData(60);
+
+    }else if(index === 1){
+
+      data = getTimerData(15);
+
+    }else{
+
+      data = getTimerData(5);
+
+    }
+
+    let colorClass =
+    'time-green';
+
+    if(data.percent < 60){
+      colorClass = 'time-yellow';
+    }
+
+    if(data.percent < 25){
+      colorClass = 'time-red';
+    }
+
+    const box =
+    document.createElement('div');
+
+    box.className = 'time-box';
+
+    box.innerHTML = `
+    
+      <div class="time-bar">
+        <div
+          class="time-fill ${colorClass}"
+          style="width:${data.percent}%">
+        </div>
+      </div>
+
+      <div class="time-info">
+
+        <div>
+          ${markerLabels[index] || `M${index+1}`}
+         [${num}]
+        </div>
+
+        <div>
+          ${data.remainText}
+        </div>
+
+      </div>
+
+    `;
+
+    timeBars.appendChild(box);
+
+  });
+
+}
+
+setInterval(() => {
+
+  renderTimeBars();
+
+}, 1000);
+setInterval(updateM15,1000);
+
+updateM15();
+
+function updateM15(){
+
+  const now = new Date();
+
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+
+  // blok 10 menit
+  const nextBlock =
+  Math.floor(minutes / 10) * 10 + 10;
+
+  let remainMinutes =
+  nextBlock - minutes - 1;
+
+  let remainSeconds =
+  60 - seconds;
+
+  if(remainSeconds === 60){
+    remainSeconds = 0;
+    remainMinutes++;
+  }
+
+  // kalau lewat jam
+  if(remainMinutes < 0){
+    remainMinutes = 0;
+  }
+
+  const mm =
+  String(remainMinutes)
+  .padStart(2,'0');
+
+  const ss =
+  String(remainSeconds)
+  .padStart(2,'0');
+
+  timerText.innerText =
+  `${mm}:${ss}`;
+
+}
 
 function updateCaret(){
 
@@ -570,11 +868,12 @@ allValues.reduce((a,b)=>a+b,0);
   Number(positiveTotal.toFixed(2));
 
   let positiveDigits =
-  positiveTotal
-  .toString()
-  .replace('.','')
-  .split('')
-  .map(Number);
+Math.abs(positiveTotal)
+.toString()
+.replace('.','')
+.replace('-','')
+.split('')
+.map(Number);
 
   let positiveSteps = [];
 
@@ -746,7 +1045,7 @@ function calculate(){
     isCalculating = false;
 
   });
-
+renderTimeBars();
 }
 
 function getFinalSingleNumber(values){
@@ -937,6 +1236,22 @@ window.onload = () => {
   expression.value.length;
 
   refreshCursor();
+
+};
+
+signalBox.onclick = () => {
+
+  if(signalLocked) return;
+
+  const value =
+  prompt('Input B/S + angka');
+
+  if(!value) return;
+
+  signalBox.innerText =
+  `[${value}]`;
+
+  signalLocked = true;
 
 };
 
