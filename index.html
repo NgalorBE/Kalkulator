@@ -404,6 +404,27 @@ document.getElementById('signalBox');
 
 const timerText =
 document.getElementById('m15Timer');
+function getCycle15(){
+
+  const now = Math.floor(Date.now() / 1000);
+
+  const cycle = 15 * 60; // 900 detik
+
+  const passed = now % cycle;
+
+  const remain = cycle - passed;
+
+  const mm = Math.floor(remain / 60);
+  const ss = remain % 60;
+
+  const percent = (remain / cycle) * 100;
+
+  return {
+    remainText: `${mm}:${ss.toString().padStart(2,'0')}`,
+    percent
+  };
+
+}
 
 const body = document.getElementById('body');
 const calculator = document.getElementById('calculator');
@@ -504,9 +525,9 @@ function renderTimeBars(){
 
       data = getTimerData(60);
 
-    }else if(index === 1){
+   }else if(index === 1){
 
-      data = getTimerData(15);
+  data = getCycle15(); // <-- GANTI INI
 
     }else{
 
@@ -571,41 +592,18 @@ updateM15();
 
 function updateM15(){
 
-  const now = new Date();
+  const data = getCycle15();
 
-  const minutes = now.getMinutes();
-  const seconds = now.getSeconds();
+  timerText.textContent = data.remainText;
 
-  // blok 10 menit
-  const nextBlock =
-  Math.floor(minutes / 10) * 10 + 10;
+  const m15Box = document.querySelectorAll(".time-box")[1];
 
-  let remainMinutes =
-  nextBlock - minutes - 1;
-
-  let remainSeconds =
-  60 - seconds;
-
-  if(remainSeconds === 60){
-    remainSeconds = 0;
-    remainMinutes++;
+  if(m15Box){
+    const fill = m15Box.querySelector(".time-fill");
+    if(fill){
+      fill.style.width = data.percent + "%";
+    }
   }
-
-  // kalau lewat jam
-  if(remainMinutes < 0){
-    remainMinutes = 0;
-  }
-
-  const mm =
-  String(remainMinutes)
-  .padStart(2,'0');
-
-  const ss =
-  String(remainSeconds)
-  .padStart(2,'0');
-
-  timerText.innerText =
-  `${mm}:${ss}`;
 
 }
 
