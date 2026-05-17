@@ -89,6 +89,7 @@ button,
   min-height:auto !important;
   height:auto !important;
   overflow:hidden;
+  caret-color:transparent;
 }
 
 #result{
@@ -103,14 +104,15 @@ button,
 }
 
 .fake-caret{
+  display:block;
   position:absolute;
   width:2px;
-  height:32px;
+  height:28px;
   background:#3b82f6;
   border-radius:20px;
   animation:blink 1s infinite;
   z-index:5;
-  transform:translateY(1px);
+  transform:translateY(-2px);
 }
 
 @keyframes blink{
@@ -290,12 +292,12 @@ buttonsContainer.addEventListener('mousedown', e => {
 });
 const fakeCaret = document.getElementById('fakeCaret');
 expression.addEventListener('focus', () => {
-  expression.setSelectionRange(cursorPos, cursorPos);
+  refreshCursor();
 });
 let darkMode = false;
 let cursorPos = expression.value.length;
 let history = [];
-expression.setSelectionRange(cursorPos,cursorPos);
+refreshCursor();
 const buttons = [
   'AC', '⌫', '%', '÷',
   '7', '8', '9', '×',
@@ -311,60 +313,56 @@ document.getElementById('hasilText');
 
 function updateCaret(){
 
-  if(document.activeElement !== expression) return;
+  requestAnimationFrame(() => {
 
-  const start = cursorPos;
+    fakeCaret.style.display = 'block';
 
-  const div =
-  document.createElement('div');
+    const textBeforeCursor =
+    expression.value.substring(0, cursorPos);
 
-  const style =
-  getComputedStyle(expression);
+    const mirror =
+    document.createElement('span');
 
-  div.style.position = 'absolute';
-  div.style.visibility = 'hidden';
-  div.style.whiteSpace = 'pre-wrap';
-  div.style.wordWrap = 'break-word';
+    const style =
+    getComputedStyle(expression);
 
-  div.style.font =
-  style.font;
-  
-div.style.letterSpacing =
-style.letterSpacing;
+    mirror.style.position = 'absolute';
+    mirror.style.visibility = 'hidden';
+    mirror.style.whiteSpace = 'pre';
+    mirror.style.font = style.font;
+    mirror.style.letterSpacing =
+    style.letterSpacing;
 
-div.style.fontWeight =
-style.fontWeight;
+    mirror.textContent =
+    textBeforeCursor;
 
-  div.style.lineHeight =
-  style.lineHeight;
+    document.body.appendChild(mirror);
 
-  div.style.padding =
-  style.padding;
+    const width =
+    mirror.getBoundingClientRect().width;
 
-  div.style.width =
-  expression.offsetWidth + 'px';
+    document.body.removeChild(mirror);
 
-  div.innerText =
-  expression.value.substring(0,start);
+    fakeCaret.style.left =
+    width + 'px';
 
-  const span =
-  document.createElement('span');
+    fakeCaret.style.top = '5px';
 
-  span.innerText = '|';
+  });
 
-  div.appendChild(span);
+}
 
-div.style.pointerEvents = 'none';
+function refreshCursor(){
 
-document.body.appendChild(div);
+  expression.focus();
 
-fakeCaret.style.left =
-(span.offsetLeft + 1) + 'px';
+  expression.setSelectionRange(
+    cursorPos,
+    cursorPos
+  );
 
-fakeCaret.style.top =
-(span.offsetTop + 2) + 'px';
+  updateCaret();
 
-document.body.removeChild(div);
 }
 
 function updateTheme(){
@@ -580,25 +578,32 @@ allValues.reduce((a,b)=>a+b,0);
 
   let positiveSteps = [];
 
-  while(positiveDigits.length > 1){
+  let limit1 = 0;
 
-    const text =
-    positiveDigits.join('+');
+while(
+  positiveDigits.length > 1 &&
+  limit1 < 10
+){
 
-    const sum =
-    positiveDigits.reduce((a,b)=>a+b,0);
+  limit1++;
 
-    positiveSteps.push(
-      `${text} = ${sum}`
-    );
+  const text =
+  positiveDigits.join('+');
 
-    positiveDigits =
-    sum.toString().split('').map(Number);
+  const sum =
+  positiveDigits.reduce((a,b)=>a+b,0);
 
-  }
+  positiveSteps.push(
+    `${text} = ${sum}`
+  );
 
-  const finalPositive =
-  positiveDigits[0];
+  positiveDigits =
+  sum.toString().split('').map(Number);
+
+}
+
+const finalPositive =
+positiveDigits[0];
 
   // =========================
 // FINAL NEGATIF
@@ -642,7 +647,14 @@ if(negativeDigits.length === 0){
   negativeDigits = [0];
 }
 
-while(negativeDigits.length > 1){
+let limit2 = 0;
+
+while(
+  negativeDigits.length > 1 &&
+  limit2 < 10
+){
+
+  limit2++;
 
   const text =
   negativeDigits.join('-');
@@ -669,10 +681,6 @@ while(negativeDigits.length > 1){
 
 const finalNegative =
 negativeDigits[0];
-
-  // =========================
-  // OUTPUT FINAL
-  // =========================
 
   outputs.push(`
   <div style="
@@ -711,16 +719,34 @@ negativeDigits[0];
 
 }
 
+let isCalculating = false;
+
 function calculate(){
-  try{
-    const html =
-    generateResults(expression.value);
-    if(result.innerHTML !== html){
-      result.innerHTML = html;
+
+  if(isCalculating) return;
+
+  isCalculating = true;
+
+  requestAnimationFrame(() => {
+
+    try{
+
+      const text = generateResults(expression.value);
+
+      if(result.innerHTML !== text){
+        result.innerHTML = text;
+      }
+
+    }catch{
+
+      result.innerHTML = '0';
+
     }
-  }catch{
-    result.innerHTML = '0';
-  }
+
+    isCalculating = false;
+
+  });
+
 }
 
 function getFinalSingleNumber(values){
@@ -762,6 +788,7 @@ function getFinalSingleNumber(values){
 }
 
 function insertText(value){
+  if(expression.value.length > 30) return;
   const currentChar =
   expression.value[cursorPos];
 
@@ -786,13 +813,10 @@ function insertText(value){
 
   cursorPos += value.length;
 
-  expression.setSelectionRange(
-    cursorPos,
-    cursorPos
-  );
+refreshCursor();
 
-  calculate();
-  updateCaret();
+calculate();
+
 }
 
 function renderButtons(){
@@ -861,11 +885,7 @@ function renderButtons(){
     cursorPos =
     last.cursor;
 
-    expression.setSelectionRange(
-      cursorPos,
-      cursorPos
-    );
-
+    refreshCursor();
     calculate();
     updateCaret();
 
@@ -877,20 +897,8 @@ function renderButtons(){
         insertText(btn);
 
       }
-
       calculate();
-
-      requestAnimationFrame(() => {
-
-        expression.setSelectionRange(
-          cursorPos,
-          cursorPos
-        );
-
-        updateCaret();
-
-      });
-
+      refreshCursor();
     };
 
     buttonsContainer.appendChild(button);
@@ -903,7 +911,8 @@ expression.addEventListener('input',calculate);
 
 expression.addEventListener('mouseup', () => {
 
-  cursorPos = expression.selectionStart;
+  cursorPos =
+  expression.selectionStart;
 
   updateCaret();
 
@@ -913,18 +922,28 @@ expression.addEventListener('touchend', () => {
 
   setTimeout(() => {
 
-    cursorPos = expression.selectionStart;
+    cursorPos =
+    expression.selectionStart;
 
     updateCaret();
 
-  }, 0);
+  },0);
 
 });
+
+window.onload = () => {
+
+  cursorPos =
+  expression.value.length;
+
+  refreshCursor();
+
+};
 
 renderButtons();
 updateTheme();
 calculate();
-updateCaret();
+
 
 </script>
 
