@@ -13,12 +13,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <style>
-    *{
-      transition: background .25s ease,
-                  color .25s ease,
-                  border .25s ease,
-                  box-shadow .25s ease;
-    }
+button,
+#calculator,
+.note-card,
+#themeToggle{
+  transition:
+  background .25s ease,
+  color .25s ease,
+  border .25s ease;
+  contain:content;
+}
 
     body{
       font-family:'Poppins',sans-serif;
@@ -149,7 +153,8 @@
   font-size:13px;
   line-height:1.6;
   box-sizing:border-box;
-  backdrop-filter:blur(10px);
+  backdrop-filter:blur(4px);
+  contain:content;
 }
 
 .dark-mode .note-card{
@@ -261,7 +266,7 @@ class="light-mode min-h-screen flex items-center justify-center p-4">
     </div>
 
     <div class="note-card">
-      m10 
+      m6
       B positif S negatif 
     </div>
     
@@ -416,14 +421,65 @@ ${darkMode
   : 'text-zinc-800'}
 `;
 
-  renderButtons();
+document.querySelectorAll('#buttons button')
+.forEach(btn => {
+
+  const isOperator =
+  ['÷','×','-','+']
+  .includes(btn.innerText);
+
+  btn.className =
+  `
+  h-10 rounded-2xl text-xl font-semibold
+  active:scale-95 transition-all
+  ${
+    isOperator
+    ? darkMode
+      ? 'operator-dark'
+      : 'operator-light'
+    : darkMode
+      ? 'btn-dark'
+      : 'btn-light'
+  }
+  `;
+});
+
 }
 
 themeToggle.onclick = () => {
   darkMode = !darkMode;
   updateTheme();
-};
+  result.className =
+`
+text-lg font-medium break-all leading-tight
+${darkMode
+  ? 'text-zinc-200'
+  : 'text-zinc-800'}
+`;
 
+document.querySelectorAll('#buttons button')
+.forEach(btn => {
+
+  const isOperator =
+  ['÷','×','-','+']
+  .includes(btn.innerText);
+
+  btn.className =
+  `
+  h-10 rounded-2xl text-xl font-semibold
+  active:scale-95 transition-all
+  ${
+    isOperator
+    ? darkMode
+      ? 'operator-dark'
+      : 'operator-light'
+    : darkMode
+      ? 'btn-dark'
+      : 'btn-light'
+  }
+  `;
+});
+};
 function saveHistory(){
 
   history.push({
@@ -431,7 +487,7 @@ function saveHistory(){
     cursor: cursorPos
   });
 
-  if(history.length > 50){
+  if(history.length > 15){
     history.shift();
   }
 
@@ -657,18 +713,15 @@ negativeDigits[0];
 }
 
 function calculate(){
-
   try{
-
-    result.innerHTML =
+    const html =
     generateResults(expression.value);
-
+    if(result.innerHTML !== html){
+      result.innerHTML = html;
+    }
   }catch{
-
     result.innerHTML = '0';
-
   }
-
 }
 
 function getFinalSingleNumber(values){
@@ -710,9 +763,6 @@ function getFinalSingleNumber(values){
 }
 
 function insertText(value){
-
-  saveHistory();
-  
   const currentChar =
   expression.value[cursorPos];
 
@@ -872,6 +922,7 @@ expression.addEventListener('touchend', () => {
 
 });
 
+renderButtons();
 updateTheme();
 calculate();
 updateCaret();
