@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RUCUP CALCULATOR</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    *{
+      transition: background .25s ease,
+                  color .25s ease,
+                  border .25s ease,
+                  box-shadow .25s ease;
+    }
+
+    body{
+      font-family:'Poppins',sans-serif;
+    }
+
+    textarea::-webkit-scrollbar{
+      display:none;
+    }
+
+    .dark-mode{
+      background:
+      radial-gradient(circle at top,#1a1a1a,#090909);
+    }
+
+    .light-mode{
+      background:
+      radial-gradient(circle at top,#ffffff,#ececec);
+    }
+
+    .calc-dark{
+      background:#111111;
+      border:1px solid #2b2b2b;
+      box-shadow:
+      0 0 30px rgba(0,0,0,.5);
+    }
+
+    .calc-light{
+      background:#ffffff;
+      border:1px solid #d4d4d4;
+      box-shadow:
+      0 0 30px rgba(0,0,0,.08);
+    }
+
+    .btn-dark{
+      background:#1c1c1c;
+      color:white;
+      border:1px solid #383838;
+    }
+
+    .btn-dark:hover{
+      background:#262626;
+    }
+
+    .btn-light{
+      background:white;
+      color:black;
+      border:1px solid #d4d4d4;
+    }
+
+    .btn-light:hover{
+      background:#f3f3f3;
+    }
+
+    .operator-dark{
+      background:#e5e5e5;
+      color:black;
+    }
+
+    .operator-light{
+      background:black;
+      color:white;
+    }
+#expression{
+  min-height:auto !important;
+  height:auto !important;
+  overflow:hidden;
+}
+
+#result{
+  margin-top:2px;
+  line-height:1.5;
+}
+
+#result br{
+  display:block;
+  content:"";
+  margin-top:2px;
+}
+
+.fake-caret{
+  position:absolute;
+  width:2px;
+  height:32px;
+  background:#3b82f6;
+  border-radius:20px;
+  animation:blink 1s infinite;
+  z-index:5;
+  transform:translateY(1px);
+}
+
+@keyframes blink{
+  0%,50%{
+    opacity:1;
+  }
+  51%,100%{
+    opacity:0;
+  }
+}
+
+.expression-wrap{
+  position:relative;
+}
+
+.notes-slider{
+  display:flex;
+  gap:0;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  overscroll-behavior-x:none;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  touch-action:pan-x;
+  padding-bottom:2px;
+}
+
+.notes-slider::-webkit-scrollbar{
+  display:none;
+}
+
+.note-card{
+  min-width:100%;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+  flex-shrink:0;
+  padding:14px;
+  border-radius:22px;
+  font-size:13px;
+  line-height:1.6;
+  box-sizing:border-box;
+  backdrop-filter:blur(10px);
+}
+
+.dark-mode .note-card{
+  background:#181818;
+  border:1px solid #2f2f2f;
+  color:#f1f1f1;
+}
+
+.light-mode .note-card{
+  background:#ffffff;
+  border:1px solid #dddddd;
+  color:#111111;
+}
+
+.dark-mode #notesTitle{
+  color:#cfcfcf;
+}
+
+.light-mode #notesTitle{
+  color:#555555;
+}
+  </style>
+</head>
+
+<body id="body"
+class="light-mode min-h-screen flex items-center justify-center p-4">
+
+  <div
+    id="calculator"
+    class="w-full max-w-sm rounded-[34px] overflow-hidden calc-light">
+
+    <!-- HEADER -->
+    <div class="flex items-center justify-between px-5 py-4 border-b border-zinc-300">
+
+      <div id="titleText" class="font-semibold text-sm tracking-wide">
+        RUCUP CALCULATOR
+      </div>
+
+      <button
+        id="themeToggle"
+        class="px-4 py-2 rounded-xl text-sm font-medium border border-zinc-300 bg-white hover:bg-zinc-100">
+        ☾ Dark
+      </button>
+
+    </div>
+
+<!-- DISPLAY -->
+<div class="flex flex-col px-5 pt-4 pb-2 gap-1">
+
+  <div class="expression-wrap">
+
+    <textarea
+      id="expression"
+      readonly
+      inputmode="none"
+      class="w-full bg-transparent text-3xl resize-none outline-none leading-tight overflow-hidden"
+      rows="1"
+      spellcheck="false">1÷2-4+2×2÷3÷2</textarea>
+
+    <div id="fakeCaret" class="fake-caret"></div>
+
+  </div>
+
+<div
+  id="hasilText"
+  class="mt-15 text-sm mb-1 font-medium opacity-70">
+  Hasil
+</div>
+
+<div
+  id="result"
+  class="text-base font-medium break-all leading-snug">
+  0
+</div>
+
+  <div
+    id="infoText"
+    class="mt-1 text-xs opacity-60 leading-tight">
+    Smart Cycle Otom:<br>
+    [÷÷|××|++|--] notes! final di dapat melalui rumus CupTrade, thanks By: MRC999✌︎
+  </div>
+
+</div>
+
+    <!-- BUTTONS -->
+    <div
+      id="buttons"
+      class="grid grid-cols-4 gap-3 p-5">
+    </div>
+    
+<!-- INFINITY NOTES -->
+<div class="px-5 pb-5">
+
+  <div id="notesTitle"
+  class="text-xs font-semibold opacity-70 mb-2">
+    CATATAN !geser
+  </div>
+
+  <div class="notes-slider">
+
+    <div class="note-card">
+      Saat m15 S ganjil B genap 
+      0/4 B 5/9 S
+    </div>
+
+    <div class="note-card">
+      Saat m15 S genap B ganjil
+      0/4 S 5/9 B
+    </div>
+
+    <div class="note-card">
+      m10 
+      B positif S negatif 
+    </div>
+    
+  </div>
+
+</div>
+
+  </div>
+
+<script>
+
+const body = document.getElementById('body');
+const calculator = document.getElementById('calculator');
+const themeToggle = document.getElementById('themeToggle');
+
+const expression = document.getElementById('expression');
+const result = document.getElementById('result');
+const buttonsContainer = document.getElementById('buttons');
+buttonsContainer.addEventListener('mousedown', e => {
+  e.preventDefault();
+});
+const fakeCaret = document.getElementById('fakeCaret');
+document.addEventListener('selectionchange', () => {
+
+  expression.setSelectionRange(
+    cursorPos,
+    cursorPos
+  );
+
+});
+let darkMode = false;
+let cursorPos = expression.value.length;
+let history = [];
+expression.setSelectionRange(cursorPos,cursorPos);
+const buttons = [
+  'AC', '⌫', '%', '÷',
+  '7', '8', '9', '×',
+  '4', '5', '6', '-',
+  '1', '2', '3', '+',
+  '0', '00', '.', '↺'
+];
+
+const titleText = document.getElementById('titleText');
+const infoText = document.getElementById('infoText');
+const hasilText =
+document.getElementById('hasilText');
+
+function updateCaret(){
+
+  const start = cursorPos;
+
+  const div =
+  document.createElement('div');
+
+  const style =
+  getComputedStyle(expression);
+
+  div.style.position = 'absolute';
+  div.style.visibility = 'hidden';
+  div.style.whiteSpace = 'pre-wrap';
+  div.style.wordWrap = 'break-word';
+
+  div.style.font =
+  style.font;
+  
+div.style.letterSpacing =
+style.letterSpacing;
+
+div.style.fontWeight =
+style.fontWeight;
+
+  div.style.lineHeight =
+  style.lineHeight;
+
+  div.style.padding =
+  style.padding;
+
+  div.style.width =
+  expression.offsetWidth + 'px';
+
+  div.innerText =
+  expression.value.substring(0,start);
+
+  const span =
+  document.createElement('span');
+
+  span.innerText = '|';
+
+  div.appendChild(span);
+
+  document.body.appendChild(div);
+
+  fakeCaret.style.left =
+(span.offsetLeft + 1) + 'px';
+
+fakeCaret.style.top =
+(span.offsetTop + 2) + 'px';
+
+  document.body.removeChild(div);
+}
+
+function updateTheme(){
+
+  body.className =
+  darkMode
+  ? 'dark-mode min-h-screen flex items-center justify-center p-4'
+  : 'light-mode min-h-screen flex items-center justify-center p-4';
+
+  calculator.className =
+  `w-full max-w-sm rounded-[34px] overflow-hidden ${
+    darkMode ? 'calc-dark' : 'calc-light'
+  }`;
+
+titleText.className =
+`font-semibold text-sm tracking-wide ${
+  darkMode ? 'text-white' : 'text-black'
+}`;
+
+infoText.className =
+`mt-4 text-xs opacity-60 leading-tight ${
+  darkMode ? 'text-zinc-300' : 'text-zinc-700'
+}`;
+hasilText.className =
+`mt-15 text-sm mb-1 font-medium opacity-70 ${
+  darkMode
+  ? 'text-zinc-400'
+  : 'text-zinc-700'
+}`;
+  themeToggle.innerHTML =
+  darkMode ? '◐ Light' : '◑ Dark';
+
+  themeToggle.className =
+  `
+  px-4 py-2 rounded-xl text-sm font-medium
+  ${darkMode
+    ? 'bg-zinc-800 text-white border border-zinc-700'
+    : 'bg-white text-black border border-zinc-300'}
+  `;
+
+  expression.className =
+  `
+  w-full bg-transparent text-3xl resize-none outline-none
+  leading-tight overflow-hidden
+  ${darkMode ? 'text-white' : 'text-black'}
+  `;
+
+  result.className =
+`
+text-lg font-medium break-all leading-tight
+${darkMode
+  ? 'text-zinc-200'
+  : 'text-zinc-800'}
+`;
+
+  renderButtons();
+}
+
+themeToggle.onclick = () => {
+  darkMode = !darkMode;
+  updateTheme();
+};
+
+function saveHistory(){
+
+  history.push({
+    value: expression.value,
+    cursor: cursorPos
+  });
+
+  if(history.length > 50){
+    history.shift();
+  }
+
+}
+
+function generateResults(input){
+
+  const operators = input.match(/[÷×+\-]/g);
+  const numbers = input.split(/[÷×+\-]/g);
+
+  if(!operators) return input;
+
+  const patterns = [
+
+    ['÷','-','+','×','÷','÷'],
+    ['×','+','-','÷','×','×'],
+    ['+','×','÷','-','+','+'],
+    ['-','÷','×','+','-','-']
+
+  ];
+
+  const formulas = patterns.map(pattern => {
+
+    let exp = '';
+
+    for(let i = 0; i < numbers.length; i++){
+
+      exp += numbers[i];
+
+      if(pattern[i]){
+        exp += pattern[i];
+      }
+
+    }
+
+    return exp;
+
+  });
+
+  const outputs = [];
+  const allValues = [];
+
+  formulas.forEach(exp => {
+
+    try{
+
+      let value = eval(
+        exp
+        .replace(/×/g,'*')
+        .replace(/÷/g,'/')
+      );
+
+      value = Number(value.toFixed(2));
+
+      outputs.push(`${exp} = ${value}`);
+
+      // hanya ambil hasil positif
+      // masuk semua hasil termasuk negatif
+allValues.push(value);
+
+    }catch{
+
+      outputs.push(`${exp} = ...`);
+
+    }
+
+  });
+
+  // =========================
+  // FINAL POSITIF
+  // =========================
+
+  let positiveText =
+allValues
+.map(v => Math.abs(v))
+.join('+');
+
+
+  let positiveTotal =
+allValues.reduce((a,b)=>a+b,0);
+
+  positiveTotal =
+  Number(positiveTotal.toFixed(2));
+
+  let positiveDigits =
+  positiveTotal
+  .toString()
+  .replace('.','')
+  .split('')
+  .map(Number);
+
+  let positiveSteps = [];
+
+  while(positiveDigits.length > 1){
+
+    const text =
+    positiveDigits.join('+');
+
+    const sum =
+    positiveDigits.reduce((a,b)=>a+b,0);
+
+    positiveSteps.push(
+      `${text} = ${sum}`
+    );
+
+    positiveDigits =
+    sum.toString().split('').map(Number);
+
+  }
+
+  const finalPositive =
+  positiveDigits[0];
+
+  // =========================
+// FINAL NEGATIF
+// =========================
+
+let negativeText =
+allValues
+.map(v => Math.abs(v))
+.join('-');
+
+// mulai dari angka pertama
+let negativeTotal = 0;
+
+if(allValues.length > 0){
+
+  negativeTotal = allValues[0];
+
+  for(let i = 1; i < allValues.length; i++){
+
+    negativeTotal -= allValues[i];
+
+  }
+
+}
+
+negativeTotal =
+Number(negativeTotal.toFixed(2));
+
+let negativeDigits =
+Math.abs(negativeTotal)
+.toString()
+.replace('.','')
+.replace('-','')
+.split('')
+.map(Number);
+
+let negativeSteps = [];
+
+// cegah kosong
+if(negativeDigits.length === 0){
+  negativeDigits = [0];
+}
+
+while(negativeDigits.length > 1){
+
+  const text =
+  negativeDigits.join('-');
+
+  let result =
+  negativeDigits[0];
+
+  for(let i = 1; i < negativeDigits.length; i++){
+
+    result -= negativeDigits[i];
+
+  }
+
+  result = Math.abs(result);
+
+  negativeSteps.push(
+    `${text} = ${result}`
+  );
+
+  negativeDigits =
+  result.toString().split('').map(Number);
+
+}
+
+const finalNegative =
+negativeDigits[0];
+
+  // =========================
+  // OUTPUT FINAL
+  // =========================
+
+  outputs.push(`
+  <div style="
+    margin-top:10px;
+    padding-top:8px;
+    border-top:1px solid #555;
+    line-height:1.6;
+  ">
+
+  <div style="
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:4px;
+  ">
+    Final
+  </div>
+
+  <div>
+    <b>Positif = ${finalPositive}</b><br>
+    ${positiveText} = ${positiveTotal}<br>
+    ${positiveSteps.join('<br>')}
+  </div>
+
+  <br>
+
+  <div>
+    <b>Negatif = ${finalNegative}</b><br>
+    ${negativeText} = ${negativeTotal}<br>
+    ${negativeSteps.join('<br>')}
+  </div>
+
+  </div>
+  `);
+
+  return outputs.join('<br>');
+
+}
+
+function calculate(){
+
+  try{
+
+    result.innerHTML =
+    generateResults(expression.value);
+
+  }catch{
+
+    result.innerHTML = '0';
+
+  }
+
+}
+
+function getFinalSingleNumber(values){
+
+  // ambil hanya angka positif
+  const positive =
+  values.filter(v => v >= 0);
+
+  // bulatkan 2 digit desimal
+  const fixed =
+  positive.map(v =>
+    Number(v.toFixed(2))
+  );
+
+  // jumlah semua
+  let total =
+  fixed.reduce((a,b)=>a+b,0);
+
+  // hilangkan titik
+  total =
+  total.toString().replace('.','');
+
+  // pecah digit
+  let digits =
+  total.split('').map(Number);
+
+  // ulang sampai 1 digit
+  while(digits.length > 1){
+
+    const sum =
+    digits.reduce((a,b)=>a+b,0);
+
+    digits =
+    sum.toString().split('').map(Number);
+
+  }
+
+  return digits[0];
+}
+
+function insertText(value){
+
+  saveHistory();
+  
+  const currentChar =
+  expression.value[cursorPos];
+
+  const isNumber =
+  /[0-9]/.test(currentChar);
+  saveHistory();
+  if(isNumber){
+    
+    expression.value =
+      expression.value.substring(0,cursorPos) +
+      value +
+      expression.value.substring(cursorPos + 1);
+
+  }else{
+
+    expression.value =
+      expression.value.substring(0,cursorPos) +
+      value +
+      expression.value.substring(cursorPos);
+
+  }
+
+  cursorPos += value.length;
+
+  expression.setSelectionRange(
+    cursorPos,
+    cursorPos
+  );
+
+  calculate();
+  updateCaret();
+}
+
+function renderButtons(){
+
+  buttonsContainer.innerHTML = '';
+
+  buttons.forEach(btn => {
+
+    const button =
+    document.createElement('button');
+
+    button.innerText = btn;
+
+    const isOperator =
+    ['÷','×','-','+'].includes(btn);
+
+    const isSpecial =
+    ['AC','⌫','='].includes(btn);
+
+    button.className =
+    `
+    h-10 rounded-2xl text-xl font-semibold
+    active:scale-95 transition-all
+    ${isOperator
+      ? darkMode
+        ? 'operator-dark'
+        : 'operator-light'
+      : darkMode
+        ? 'btn-dark'
+        : 'btn-light'}
+    `;
+
+    button.onclick = () => {
+
+      if(btn === 'AC'){
+
+        expression.value = '';
+        cursorPos = 0;
+
+      }
+
+      else if(btn === '⌫'){
+
+        if(cursorPos > 0){
+
+          expression.value =
+            expression.value.substring(0,cursorPos - 1) +
+            expression.value.substring(cursorPos);
+
+          cursorPos--;
+
+        }
+
+      }
+
+      else if(btn === '↺'){
+
+  if(history.length > 0){
+
+    const last =
+    history.pop();
+
+    expression.value =
+    last.value;
+
+    cursorPos =
+    last.cursor;
+
+    expression.setSelectionRange(
+      cursorPos,
+      cursorPos
+    );
+
+    calculate();
+    updateCaret();
+
+  }
+
+}
+      else{
+
+        insertText(btn);
+
+      }
+
+      calculate();
+
+      requestAnimationFrame(() => {
+
+        expression.setSelectionRange(
+          cursorPos,
+          cursorPos
+        );
+
+        updateCaret();
+
+      });
+
+    };
+
+    buttonsContainer.appendChild(button);
+
+  });
+
+}
+
+expression.addEventListener('input',calculate);
+
+expression.addEventListener('mouseup', () => {
+
+  cursorPos = expression.selectionStart;
+
+  updateCaret();
+
+});
+
+expression.addEventListener('touchend', () => {
+
+  setTimeout(() => {
+
+    cursorPos = expression.selectionStart;
+
+    updateCaret();
+
+  }, 0);
+
+});
+
+updateTheme();
+calculate();
+updateCaret();
+
+</script>
+
+</body>
+</html>
