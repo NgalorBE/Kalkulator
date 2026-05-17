@@ -289,13 +289,8 @@ buttonsContainer.addEventListener('mousedown', e => {
   e.preventDefault();
 });
 const fakeCaret = document.getElementById('fakeCaret');
-document.addEventListener('selectionchange', () => {
-
-  expression.setSelectionRange(
-    cursorPos,
-    cursorPos
-  );
-
+expression.addEventListener('focus', () => {
+  expression.setSelectionRange(cursorPos, cursorPos);
 });
 let darkMode = false;
 let cursorPos = expression.value.length;
@@ -315,6 +310,8 @@ const hasilText =
 document.getElementById('hasilText');
 
 function updateCaret(){
+
+  if(document.activeElement !== expression) return;
 
   const start = cursorPos;
 
@@ -357,15 +354,17 @@ style.fontWeight;
 
   div.appendChild(span);
 
-  document.body.appendChild(div);
+div.style.pointerEvents = 'none';
 
-  fakeCaret.style.left =
+document.body.appendChild(div);
+
+fakeCaret.style.left =
 (span.offsetLeft + 1) + 'px';
 
 fakeCaret.style.top =
 (span.offsetTop + 2) + 'px';
 
-  document.body.removeChild(div);
+document.body.removeChild(div);
 }
 
 function updateTheme(){
