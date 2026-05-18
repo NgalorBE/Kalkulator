@@ -396,9 +396,14 @@ class="time-slider mt-2"></div>
 <script>
 let m15Duration = 10 * 60;
 let timeLeft = m15Duration;
-
+let lastCycleId = -1;
+let globalCycleId = -1;
 let signalLocked = false;
-
+let slotState = {};
+let initialized = false;
+let slotSnapshot = {};
+let cycleBaseline = {};
+let lastCycleIdMap = {};
 const signalBox =
 document.getElementById('signalBox');
 
@@ -499,31 +504,152 @@ function getTimerData(totalMinutes){
 
 }
 
+function getCycle1Hour(){
+
+  const now = new Date();
+
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+
+  const passed =
+  (minutes * 60) + seconds;
+
+  const remain =
+  (60 * 60) - passed;
+
+  const percent =
+  (remain / (60 * 60)) * 100;
+
+  const mm =
+  Math.floor(remain / 60);
+
+  const ss =
+  remain % 60;
+
+  return {
+    remainText:
+    `${mm}:${ss.toString().padStart(2,'0')}`,
+    percent
+  };
+
+}
+
 function renderTimeBars(){
 
-  const markerLabels = [
-  'J1',
-  'M15',
-  'M5',
-  'M0',
-  'M1',
-  'M2',
-  'M3'
-];
-  const nums =
-  expression.value
-  .split(/[÷×+\-]/g)
-  .filter(v => v !== '');
+  const markerLabels = ['J1','M15','M5','M0','M1','M2','M3'];
 
+  let numsRaw =
+expression.value
+.split(/[÷×+\-]/g)
+.filter(v => v !== '');
+
+const nums = [...numsRaw];
+
+// AUTO HITUNG SLOT KE-3
+if(nums.length >= 5){
+
+  const j1  = Number(nums[0]) || 0;
+  const m15 = Number(nums[1]) || 0;
+  const m0  = Number(nums[3]) || 0;
+  const m1  = Number(nums[4]) || 0;
+
+  let autoValue = 0;
+
+  try{
+
+    autoValue =
+    (j1 / (m15 || 1)) + (m0 * m1);
+
+const textValue = autoValue.toString();
+
+if(textValue.includes('.')){
+
+  const decimal =
+  textValue.split('.')[1];
+
+ 
+  if(decimal[1] === decimal[0]){
+
+    autoValue =
+    parseFloat(
+      textValue.match(/^\d+(\.\d{1})?/)[0]
+    );
+
+  }else{
+    autoValue =
+    parseFloat(
+      textValue.match(/^\d+(\.\d{1,2})?/)[0]
+    );
+
+  }
+
+}
+
+  }catch{}
+
+  // posisi ke-3 otomatis
+  nums[2] = autoValue.toString();
+  nums[2] = autoValue.toString();
+
+// SYNC KE EXPRESSION
+const operators =
+expression.value.match(/[÷×+\-]/g) || [];
+
+let rebuilt = '';
+
+nums.forEach((v,i)=>{
+
+  rebuilt += v;
+
+  if(operators[i]){
+    rebuilt += operators[i];
+  }
+
+});
+
+// update expression TANPA loop
+if(expression.value !== rebuilt){
+
+  expression.value = rebuilt;
+
+}
+}
   timeBars.innerHTML = '';
 
-  nums.forEach((num,index)=>{
+  nums.forEach((num, index) => {
+
+  const label = markerLabels[index];
+  if(!label) return;
+
+  const currentValue = num;
+  const prevValue = slotSnapshot[label];
+
+// FIRST TIME = NEW
+if(prevValue === undefined){
+
+  slotState[label] = {
+    changed:false
+  };
+
+}
+
+// SUDAH BERUBAH = OK
+else if(prevValue !== currentValue){
+
+  slotState[label] = {
+    changed:true
+  };
+
+}
+
+// update snapshot terbaru
+slotSnapshot[label] = currentValue;
 
     let data;
 
     if(index === 0){
 
-      data = getTimerData(60);
+      data = getCycle1Hour();
 
    }else if(index === 1){
 
@@ -561,7 +687,15 @@ function renderTimeBars(){
       </div>
 
       <div class="time-info">
-
+<span style="
+  font-size:10px;
+  padding:2px 6px;
+  border-radius:8px;
+  background:${slotState[label]?.changed ? '#22c55e' : '#ef4444'};
+  color:white;
+">
+  ${slotState[label]?.changed ? 'OK' : 'NEW'}
+</span>
         <div>
           ${markerLabels[index] || `M${index+1}`}
          [${num}]
@@ -593,18 +727,53 @@ updateM15();
 function updateM15(){
 
   const data = getCycle15();
-
   timerText.textContent = data.remainText;
 
-  const m15Box = document.querySelectorAll(".time-box")[1];
+  const currentCycle = Math.floor(Date.now() / (15 * 60 * 1000));
 
+  // 🚨 CYCLE BERGANTI = RESET TOTAL
+if(currentCycle !== globalCycleId){
+
+  globalCycleId = currentCycle;
+
+  signalLocked = false;
+  signalBox.innerText = "[--]";
+
+  // RESET SLOT STATE
+  slotState = {};
+  slotSnapshot = {};
+  cycleBaseline = {};
+}
+
+  const m15Box = document.querySelectorAll(".time-box")[1];
   if(m15Box){
     const fill = m15Box.querySelector(".time-fill");
     if(fill){
       fill.style.width = data.percent + "%";
     }
   }
+}
 
+function getCycleIdByIndex(index){
+
+  if(index === 0){
+    return Math.floor(Date.now() / 60000); // J1 (1 menit)
+  }
+
+  if(index === 1){
+    return Math.floor(Date.now() / 900000); // M15
+  }
+
+  return Math.floor(Date.now() / 300000); // lainnya
+}
+
+function markSlotChanged(index){
+  const label = ['J1','M15','M5','M0','M1','M2','M3'];
+  const key = label[index] || `M${index}`;
+
+  if(!slotState[key]) slotState[key] = { changed: false };
+
+  slotState[key].changed = true;
 }
 
 function updateCaret(){
@@ -1085,37 +1254,91 @@ function getFinalSingleNumber(values){
 }
 
 function insertText(value){
+
+  // hanya angka & titik
+  if(!/[0-9.]/.test(value)) return;
+
   if(expression.value.length > 30) return;
+
   const currentChar =
   expression.value[cursorPos];
 
-  const isNumber =
-  /[0-9]/.test(currentChar);
   saveHistory();
-  if(isNumber){
-    
+
+const numbers =
+expression.value
+.match(/\d+(\.\d+)?/g) || [];
+
+let start = 0;
+
+for(let i = 0; i < numbers.length; i++){
+
+  const num = numbers[i];
+
+  const pos =
+  expression.value.indexOf(num, start);
+
+  // SLOT KE-3 = INDEX 2
+  if(i === 2){
+
+    const endPos = pos + num.length;
+
+    // cursor berada di angka auto
+    if(cursorPos >= pos && cursorPos <= endPos){
+
+      return; // blok edit
+    }
+
+  }
+
+  start = pos + num.length;
+}
+  // kalau posisi sekarang angka
+  if(/[0-9.]/.test(currentChar)){
+
     expression.value =
       expression.value.substring(0,cursorPos) +
       value +
       expression.value.substring(cursorPos + 1);
 
-  }else{
-
-    expression.value =
-      expression.value.substring(0,cursorPos) +
-      value +
-      expression.value.substring(cursorPos);
-
   }
 
-  cursorPos += value.length;
+  // kalau operator → cari angka berikutnya
+  else{
 
-refreshCursor();
+    let nextPos = cursorPos;
 
-calculate();
+    while(
+      nextPos < expression.value.length &&
+      /[÷×+\-]/.test(expression.value[nextPos])
+    ){
+      nextPos++;
+    }
 
+    if(nextPos >= expression.value.length) return;
+
+    expression.value =
+      expression.value.substring(0,nextPos) +
+      value +
+      expression.value.substring(nextPos + 1);
+
+    cursorPos = nextPos;
+  }
+
+  cursorPos++;
+
+  refreshCursor();
+  calculate();
 }
 
+function markSlotChangedByLabel(label){
+
+  if(!slotState[label]) {
+    slotState[label] = { changed:false };
+  }
+
+  slotState[label].changed = true;
+}
 function renderButtons(){
 
   buttonsContainer.innerHTML = '';
@@ -1157,17 +1380,25 @@ function renderButtons(){
 
       else if(btn === '⌫'){
 
-        if(cursorPos > 0){
+  if(cursorPos > 0){
 
-          expression.value =
-            expression.value.substring(0,cursorPos - 1) +
-            expression.value.substring(cursorPos);
+    const prevChar =
+    expression.value[cursorPos - 1];
 
-          cursorPos--;
+    // jangan hapus operator
+    if(/[÷×+\-]/.test(prevChar)){
+      return;
+    }
 
-        }
+    expression.value =
+      expression.value.substring(0,cursorPos - 1) +
+      expression.value.substring(cursorPos);
 
-      }
+    cursorPos--;
+
+  }
+
+}
 
       else if(btn === '↺'){
 
@@ -1191,9 +1422,12 @@ function renderButtons(){
 }
       else{
 
-        insertText(btn);
+  // operator tidak boleh diinput
+  if(/[÷×+\-]/.test(btn)) return;
 
-      }
+  insertText(btn);
+
+}
       calculate();
       refreshCursor();
     };
@@ -1241,16 +1475,15 @@ signalBox.onclick = () => {
 
   if(signalLocked) return;
 
-  const value =
-  prompt('Input B/S + angka');
-
+  const value = prompt('Input B/S + angka');
   if(!value) return;
 
-  signalBox.innerText =
-  `[${value}]`;
+  signalBox.innerText = `[${value}]`;
 
   signalLocked = true;
 
+  // MARK SLOT M15 SEBAGAI SUDAH DIUBAH
+  markSlotChangedByLabel('M15');
 };
 
 renderButtons();
