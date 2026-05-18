@@ -387,6 +387,11 @@ class="light-mode min-h-screen flex items-center justify-center p-4">
       B positif S negatif 
     </div>
     
+    <div class="note-card">
+      M15A & M15B di hasilkan
+      dr pe÷an yg hasilkan M15
+    </div>
+    
   </div>
 
 <div id="timeBars"
@@ -536,7 +541,7 @@ function getCycle1Hour(){
 
 function renderTimeBars(){
 
-  const markerLabels = ['J1','M15','M5','M0','M1','M2','M3'];
+  const markerLabels = ['M15A','M15B','M5','M0','M1','M2','M3'];
 
   let numsRaw =
 expression.value
@@ -576,10 +581,13 @@ if(textValue.includes('.')){
     );
 
   }else{
-    autoValue =
-    parseFloat(
-      textValue.match(/^\d+(\.\d{1,2})?/)[0]
-    );
+    // POTONG 1 ANGKA DI BELAKANG TITIK
+autoValue =
+parseFloat(
+  autoValue
+  .toString()
+  .match(/^\d+(\.\d{1})?/)[0]
+);
 
   }
 
@@ -757,7 +765,7 @@ if(currentCycle !== globalCycleId){
 function getCycleIdByIndex(index){
 
   if(index === 0){
-    return Math.floor(Date.now() / 60000); // J1 (1 menit)
+    return Math.floor(Date.now() / 60000); 
   }
 
   if(index === 1){
@@ -768,7 +776,7 @@ function getCycleIdByIndex(index){
 }
 
 function markSlotChanged(index){
-  const label = ['J1','M15','M5','M0','M1','M2','M3'];
+  const label = ['M15A','M15B','M5','M0','M1','M2','M3'];
   const key = label[index] || `M${index}`;
 
   if(!slotState[key]) slotState[key] = { changed: false };
