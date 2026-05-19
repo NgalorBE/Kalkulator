@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RUCUP CALCULATOR</title>
-   <link rel="icon"
-   href="https://cdn-icons-png.flaticon.com/512/2721/2721297.png">
+  <title>RUCUP KALKULALOR</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -284,6 +283,209 @@ button,
   font-size:12px;
   font-weight:600;
 }
+
+/* =========================
+   LOGO WRAP
+========================= */
+
+.logo-wrap{
+  position:relative;
+  width:32px;
+  height:32px;
+  overflow:hidden;
+}
+
+/* LOGO */
+#logoIcon{
+  width:32px;
+  height:32px;
+  display:block;
+  position:relative;
+  z-index:1;
+}
+
+/* OVERLAY BW */
+.logo-wrap::after{
+
+  content:'';
+
+  position:absolute;
+
+  top:-120%;
+  left:-120%;
+
+  width:260%;
+  height:260%;
+
+  background:
+  rgba(150,150,150,.95);
+
+  mix-blend-mode:saturation;
+
+  transform:
+  rotate(-35deg)
+  translate(220%,-220%);
+
+  animation:
+  logoSweep 7s linear infinite;
+
+  pointer-events:none;
+
+  z-index:2;
+}
+
+/* =========================
+   TITLE
+========================= */
+
+#titleText{
+
+  position:relative;
+
+  overflow:hidden;
+
+  white-space:nowrap;
+}
+
+/* MODE */
+.dark-mode #titleText{
+  color:#fff;
+}
+
+.light-mode #titleText{
+  color:#000;
+}
+
+/* LAYER ABU */
+#titleText::after{
+
+  content:'RUCUP KALKULALOR';
+
+  position:absolute;
+
+  inset:0;
+
+  color:#9ca3af;
+
+  white-space:nowrap;
+
+  clip-path:inset(0 100% 0 0);
+
+  opacity:0;
+
+  animation:
+  textSweep 7s linear infinite;
+}
+
+/* =========================
+   LOGO FLOW
+========================= */
+
+@keyframes logoSweep{
+
+  /* NORMAL */
+  0%{
+    transform:
+    rotate(-35deg)
+    translate(220%,-220%);
+
+    opacity:0;
+  }
+
+  /* MULAI MASUK */
+  10%{
+    opacity:1;
+  }
+
+  /* SAPU BW */
+  35%{
+    transform:
+    rotate(-35deg)
+    translate(20%,-20%);
+
+    opacity:1;
+  }
+
+  /* FULL BW */
+  45%{
+    transform:
+    rotate(-35deg)
+    translate(-20%,20%);
+
+    opacity:1;
+  }
+
+  /* TAHAN SAMPAI TEKS SELESAI */
+  72%{
+    transform:
+    rotate(-35deg)
+    translate(-20%,20%);
+
+    opacity:1;
+  }
+
+  /* DIAM 1 DETIK */
+  86%{
+    transform:
+    rotate(-35deg)
+    translate(-20%,20%);
+
+    opacity:1;
+  }
+
+/* BALIK NORMAL CLASSIC */
+100%{
+  transform:
+  rotate(-35deg)
+  translate(-20%,20%);
+
+  opacity:0;
+}
+
+}
+
+/* =========================
+   TEXT FLOW
+========================= */
+
+@keyframes textSweep{
+
+  /* BELUM MULAI */
+  0%{
+    clip-path:inset(0 100% 0 0);
+    opacity:0;
+  }
+
+  44%{
+    clip-path:inset(0 100% 0 0);
+    opacity:0;
+  }
+
+  /* TRANSISI SETELAH LOGO */
+  58%{
+    clip-path:inset(0 0 0 0);
+    opacity:1;
+  }
+
+  /* FULL ABU */
+  72%{
+    clip-path:inset(0 0 0 0);
+    opacity:1;
+  }
+
+  /* DIAM 1 DETIK */
+  86%{
+    clip-path:inset(0 0 0 0);
+    opacity:1;
+  }
+
+  /* FADE CLASSIC */
+  100%{
+    clip-path:inset(0 0 0 0);
+    opacity:0;
+  }
+
+}
   </style>
 </head>
 
@@ -294,20 +496,35 @@ class="light-mode min-h-screen flex items-center justify-center p-4">
     id="calculator"
     class="w-full max-w-sm rounded-[34px] overflow-hidden calc-light">
 
-    <!-- HEADER -->
-    <div class="flex items-center justify-between px-5 py-4 border-b border-zinc-300">
+      <!-- HEADER -->
+<div class="flex items-center justify-between px-5 py-4 border-b border-zinc-300">
 
-      <div id="titleText" class="font-semibold text-sm tracking-wide">
-        RUCUP CALCULATOR
-      </div>
+<!-- LEFT -->
+<div class="flex items-center gap-1">
 
-      <button
-        id="themeToggle"
-        class="px-4 py-2 rounded-xl text-sm font-medium border border-zinc-300 bg-white hover:bg-zinc-100">
-        ☾ Dark
-      </button>
+  <div class="logo-wrap">
+    <img
+      id="logoIcon"
+      src="https://i.ibb.co.com/JF7VQSch/20260419-201815.png"
+      class="w-8 h-8 object-contain">
+  </div>
 
-    </div>
+  <div
+    id="titleText"
+    class="font-semibold text-base tracking-wide translate-y-[9px]">
+    RUCUP KALKULALOR
+  </div>
+
+</div>
+
+  <!-- RIGHT -->
+  <button
+    id="themeToggle"
+    class="px-4 py-2 rounded-xl text-sm font-medium border border-zinc-300 bg-white hover:bg-zinc-100">
+    ☾ Dark
+  </button>
+
+</div>
 
 <!-- DISPLAY -->
 <div class="flex flex-col px-5 pt-4 pb-2 gap-1">
@@ -847,9 +1064,13 @@ function updateTheme(){
   }`;
 
 titleText.className =
-`font-semibold text-sm tracking-wide ${
-  darkMode ? 'text-white' : 'text-black'
-}`;
+`
+font-semibold
+text-sm
+tracking-wide
+translate-y-[9px]
+${darkMode ? 'text-white' : 'text-black'}
+`;
 
 infoText.className =
 `mt-4 text-xs opacity-60 leading-tight ${
@@ -881,7 +1102,7 @@ hasilText.className =
 
   result.className =
 `
-text-lg font-medium break-all leading-tight
+text-base font-medium break-all leading-tight
 ${darkMode
   ? 'text-zinc-200'
   : 'text-zinc-800'}
@@ -917,7 +1138,7 @@ themeToggle.onclick = () => {
   updateTheme();
   result.className =
 `
-text-lg font-medium break-all leading-tight
+text-base font-medium break-all leading-tight
 ${darkMode
   ? 'text-zinc-200'
   : 'text-zinc-800'}
