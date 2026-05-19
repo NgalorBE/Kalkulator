@@ -319,7 +319,7 @@ class="light-mode min-h-screen flex items-center justify-center p-4">
       inputmode="none"
       class="w-full bg-transparent text-3xl resize-none outline-none leading-tight overflow-hidden"
       rows="1"
-      spellcheck="false">1÷2-4+2×2÷3÷2</textarea>
+      spellcheck="false">1÷1-4+2×2÷2÷2</textarea>
 
     <div id="fakeCaret" class="fake-caret"></div>
 
@@ -381,15 +381,10 @@ class="light-mode min-h-screen flex items-center justify-center p-4">
       Saat m15 S genap B ganjil
       0/4 S 5/9 B
     </div>
-
-    <div class="note-card">
-      m4/5/6/7/8 dikt
-      B positif S negatif 
-    </div>
     
     <div class="note-card">
       M15A & M15B di hasilkan
-      dr pe÷an yg hasilkan M15 pe÷an hrs menggunakan angka genap/kalau di atas 5 pakai 1 di M15A dan M15B pakai M15
+      M15A dr M15 di menit sebelumny M15B di menit M15 sekarang 
     </div>
     
   </div>
@@ -1010,13 +1005,11 @@ function generateResults(input){
         .replace(/÷/g,'/')
       );
 
-      value = Number(value.toFixed(2));
+      value = Number(value.toFixed(12));
 
       outputs.push(`${exp} = ${value}`);
 
-      // hanya ambil hasil positif
-      // masuk semua hasil termasuk negatif
-allValues.push(value);
+      allValues.push(value);
 
     }catch{
 
@@ -1027,136 +1020,69 @@ allValues.push(value);
   });
 
   // =========================
-  // FINAL POSITIF
+  // HASIL DASAR
   // =========================
 
-  let positiveText =
-allValues
-.map(v => Math.abs(v))
-.join('+');
+  let a = allValues[0] || 0; // ÷÷
+  let b = allValues[1] || 0; // ××
+  let c = allValues[2] || 0; // ++
+  let d = allValues[3] || 0; // --
 
+  // =========================
+  // FINAL POSITIF BARU
+  // (÷÷)×(××)+(++)-(--)÷(÷÷)
+  // =========================
 
-  let positiveTotal =
-allValues.reduce((a,b)=>a+b,0);
+  let firstValue = a;
+
+  let lastDivider = Math.abs(a);
+
+  // kalau awal positif
+  // negatif dipindah ke belakang
+  if(a >= 0){
+
+    lastDivider = -Math.abs(a);
+
+  }
+
+  let positiveFormula =
+  `${firstValue}×${b}+${c}-${d}÷${lastDivider}`;
+
+  let positiveTotal = (
+    (firstValue * b)
+    + c
+    - (d / lastDivider)
+  );
 
   positiveTotal =
-  Number(positiveTotal.toFixed(2));
-
-  let positiveDigits =
-Math.abs(positiveTotal)
-.toString()
-.replace('.','')
-.replace('-','')
-.split('')
-.map(Number);
-
-  let positiveSteps = [];
-
-  let limit1 = 0;
-
-while(
-  positiveDigits.length > 1 &&
-  limit1 < 10
-){
-
-  limit1++;
-
-  const text =
-  positiveDigits.join('+');
-
-  const sum =
-  positiveDigits.reduce((a,b)=>a+b,0);
-
-  positiveSteps.push(
-    `${text} = ${sum}`
-  );
-
-  positiveDigits =
-  sum.toString().split('').map(Number);
-
-}
-
-const finalPositive =
-positiveDigits[0];
+  Number(positiveTotal.toFixed(12));
 
   // =========================
-// FINAL NEGATIF
-// =========================
+  // FINAL NEGATIF BARU
+  // (--)+(++)×(××)÷(÷÷)-(--)
+  // =========================
 
-let negativeText =
-allValues
-.map(v => Math.abs(v))
-.join('-');
+  let firstNegativeDivider =
+  Math.abs(a);
 
-// mulai dari angka pertama
-let negativeTotal = 0;
+  let negativeFormula =
+  `${d}+${c}×${b}÷${firstNegativeDivider}-${d}`;
 
-if(allValues.length > 0){
-
-  negativeTotal = allValues[0];
-
-  for(let i = 1; i < allValues.length; i++){
-
-    negativeTotal -= allValues[i];
-
-  }
-
-}
-
-negativeTotal =
-Number(negativeTotal.toFixed(2));
-
-let negativeDigits =
-Math.abs(negativeTotal)
-.toString()
-.replace('.','')
-.replace('-','')
-.split('')
-.map(Number);
-
-let negativeSteps = [];
-
-// cegah kosong
-if(negativeDigits.length === 0){
-  negativeDigits = [0];
-}
-
-let limit2 = 0;
-
-while(
-  negativeDigits.length > 1 &&
-  limit2 < 10
-){
-
-  limit2++;
-
-  const text =
-  negativeDigits.join('-');
-
-  let result =
-  negativeDigits[0];
-
-  for(let i = 1; i < negativeDigits.length; i++){
-
-    result -= negativeDigits[i];
-
-  }
-
-  result = Math.abs(result);
-
-  negativeSteps.push(
-    `${text} = ${result}`
+  let negativeTotal = (
+    d
+    + ((c * b) / firstNegativeDivider)
+    - d
   );
 
-  negativeDigits =
-  result.toString().split('').map(Number);
+  negativeTotal =
+  Number(negativeTotal.toFixed(12));
 
-}
-
-const finalNegative =
-negativeDigits[0];
+  // =========================
+  // OUTPUT
+  // =========================
 
   outputs.push(`
+
   <div style="
     margin-top:10px;
     padding-top:8px;
@@ -1164,29 +1090,30 @@ negativeDigits[0];
     line-height:1.6;
   ">
 
-  <div style="
-    font-size:18px;
-    font-weight:700;
-    margin-bottom:4px;
-  ">
-    Final
+    <div style="
+      font-size:18px;
+      font-weight:700;
+      margin-bottom:4px;
+    ">
+      Final
+    </div>
+
+    <div>
+      <b>M15 1/2/3/4</b><br>
+      ${positiveFormula}<br>
+      = ${positiveTotal}
+    </div>
+
+    <br>
+
+    <div>
+      <b>M15 5/6/7/8</b><br>
+      ${negativeFormula}<br>
+      = ${negativeTotal}
+    </div>
+
   </div>
 
-  <div>
-    <b>Positif = ${finalPositive}</b><br>
-    ${positiveText} = ${positiveTotal}<br>
-    ${positiveSteps.join('<br>')}
-  </div>
-
-  <br>
-
-  <div>
-    <b>Negatif = ${finalNegative}</b><br>
-    ${negativeText} = ${negativeTotal}<br>
-    ${negativeSteps.join('<br>')}
-  </div>
-
-  </div>
   `);
 
   return outputs.join('<br>');
