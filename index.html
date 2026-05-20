@@ -296,10 +296,6 @@ button,
   font-weight:600;
 }
 
-/* =========================
-   LOGO WRAP
-========================= */
-
 .logo-wrap{
   position:relative;
   width:42px;
@@ -368,7 +364,6 @@ font-weight:700;
   color: rgba(255,255,255,0.85);
 }
 
-/* MODE */
 .dark-mode #titleText{
   color:#fff;
 }
@@ -386,27 +381,21 @@ font-weight:700;
   background: linear-gradient(
   90deg,
 
-  /* PUTIH + SILVER */
   #ff0000 0%,
   #0066ff 10%,
 
-  /* HIJAU + HITAM */
   #00ff00 18%,
   #001a00 28%,
 
-  /* PUTIH + ABU */
   #f5f5f5 34%,
   #bdbdbd 42%,
 
-  /* MERAH + BIRU */
   #ffffff 48%,
   #dcdcdc 58%,
 
-  /* ORANYE + KUNING */
   #ff6a00 64%,
   #ffd500 74%,
 
-  /* CYAN + BIRU */
   #00d9ff 84%,
   #004cff 100%
 );
@@ -420,13 +409,12 @@ opacity:1;
   clip-path: inset(0 100% 0 0);
   opacity: 1;
 
-  /* 🔥 GLASSY GLOW */
   filter:
     blur(2px)
     drop-shadow(0 0 4px rgba(255,255,255,0.25))
     drop-shadow(0 0 8px rgba(0,255,255,0.15));
 
-  mix-blend-mode: screen; /* bikin glow nyatu sama warna */
+  mix-blend-mode: screen; 
 
   animation: textSweep 7s linear infinite;
   animation-delay: 0s;
@@ -440,7 +428,6 @@ opacity:1;
 
   color:transparent;
 
-  /* glow warna netral + sedikit RGB */
   text-shadow:
     0 0 3px rgba(255,255,255,0.25),
     0 0 6px rgba(0,255,255,0.12),
@@ -469,7 +456,6 @@ opacity:1;
     opacity:1;
   }
 
-  /* MULAI MASUK MELENGKUNG */
   22%{
     transform:
     rotate(-28deg)
@@ -479,7 +465,6 @@ opacity:1;
     opacity:1;
   }
 
-  /* SWEEP TENGAH */
   38%{
     transform:
     rotate(-18deg)
@@ -489,7 +474,6 @@ opacity:1;
     opacity:1;
   }
 
-  /* FULL BW */
   50%{
     transform:
     rotate(-8deg)
@@ -499,7 +483,6 @@ opacity:1;
     opacity:1;
   }
 
-  /* TAHAN */
   68%{
     transform:
     rotate(-8deg)
@@ -509,7 +492,6 @@ opacity:1;
     opacity:1;
   }
 
-  /* DIAM */
   82%{
     transform:
     rotate(-8deg)
@@ -519,7 +501,6 @@ opacity:1;
     opacity:1;
   }
 
-  /* FADE */
   100%{
     transform:
     rotate(-8deg)
@@ -532,25 +513,21 @@ opacity:1;
 }
 @keyframes logoGlitch{
 
-  /* NORMAL */
   0%{
     filter:none;
     transform:translate(0,0);
   }
 
-  /* IKUT BW */
   40%{
     filter:grayscale(100%);
     transform:translate(0,0);
   }
 
-  /* TAHAN BW */
   82%{
     filter:grayscale(100%);
     transform:translate(0,0);
   }
 
-  /* GLITCH CEPAT */
   84%{
     filter:none
     contrast(1.4)
@@ -575,7 +552,6 @@ opacity:1;
     translate(1px,1px);
   }
 
-  /* BALIK NORMAL */
   90%{
     filter:none;
     transform:translate(0,0);
@@ -590,42 +566,186 @@ opacity:1;
 
 @keyframes textSweep{
 
-  /* HIDDEN */
   0%{
     clip-path:inset(0 100% 0 0);
     opacity:1;
   }
-
-  /* TUNGGU LOGO */
+  
   34%{
     clip-path:inset(0 100% 0 0);
     opacity:1;
   }
 
-  /* LANGSUNG START SETELAH LOGO */
   46%{
     clip-path:inset(0 0 0 0);
     opacity:1;
   }
 
-  /* FULL WARNA */
   68%{
     clip-path:inset(0 0 0 0);
     opacity:1;
   }
 
-  /* DIAM */
   82%{
     clip-path:inset(0 0 0 0);
     opacity:1;
   }
 
-  /* FADE CLASSIC */
   100%{
     clip-path:inset(0 0 0 0);
     opacity:0;
   }
 
+}
+
+.floating-pad{
+will-change:transform;
+
+transition:
+box-shadow .2s,
+transform .08s linear;
+  position:fixed;
+  left:18px;
+  bottom:85px;
+  width:140px;
+  background:
+  rgba(15,15,15,.78);
+  backdrop-filter:
+  blur(18px);
+  border:
+  1px solid rgba(255,255,255,.06);
+  border-radius:24px;
+  overflow:hidden;
+  z-index:99999;
+  box-shadow:
+  0 10px 35px rgba(0,0,0,.35);
+  user-select:none;
+  touch-action:none;
+}
+
+.pad-header{
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 14px;
+  font-size:13px;
+  font-weight:700;
+  background:
+  rgba(255,255,255,.04);
+  cursor:grab;
+}
+
+.pad-header button{
+  width:24px;
+  height:24px;
+  border:none;
+  border-radius:8px;
+  background:
+  rgba(255,255,255,.08);
+  color:white;
+  font-size:15px;
+}
+
+.pad-body{
+  padding:8px;
+  display:grid;
+  grid-template-columns:
+  repeat(3,1fr);
+  gap:6px;
+}
+
+.pad-btn{
+  height:38px;
+  border:none;
+  border-radius:16px;
+  font-size:15px;
+  font-weight:700;
+  color:white;
+  background:
+  linear-gradient(
+    180deg,
+    rgba(255,255,255,.08),
+    rgba(255,255,255,.03)
+  );
+
+  transition:.15s;
+}
+
+.pad-btn:active{
+  transform:scale(.92);
+}
+
+.floating-pad.hidden{
+
+  height:42px;
+}
+
+.floating-pad.hidden .pad-body{
+
+  display:none;
+}
+
+.floating-pad.minimized{
+
+  width:46px;
+  height:46px;
+
+  border-radius:999px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0;
+
+  overflow:hidden;
+}
+
+.floating-pad.minimized .pad-body,
+.floating-pad.minimized .pad-header span{
+
+  display:none;
+}
+
+.floating-pad.minimized .pad-header{
+
+  width:100%;
+  height:100%;
+
+  padding:0;
+
+  border:none;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:
+  linear-gradient(
+    145deg,
+    rgba(255,255,255,.12),
+    rgba(255,255,255,.04)
+  );
+
+  backdrop-filter:blur(12px);
+  border-radius:999px;
+  cursor:pointer;
+}
+
+.floating-pad.minimized #hidePadBtn{
+
+  width:100%;
+  height:100%;
+
+  border:none;
+
+  background:none;
+
+  font-size:18px;
+  font-weight:700;
+
+  color:white;
 }
   </style>
 </head>
@@ -705,11 +825,11 @@ class="light-mode min-h-screen flex items-center justify-center p-4">
 
 </div>
 
-    <!-- BUTTONS -->
-    <div
-      id="buttons"
-      class="grid grid-cols-4 gap-3 p-5">
-    </div>
+<!-- BUTTONS HIDDEN -->
+<div
+  id="buttons"
+  style="display:none">
+</div>
 
 <!-- INFINITY NOTES -->
 <div class="px-5 pb-5">
@@ -742,8 +862,17 @@ class="light-mode min-h-screen flex items-center justify-center p-4">
     </div>
     
     <div class="note-card">
-      M15A & M15B di hasilkan
-      M15A dr M15 di menit sebelumny M15B di menit M15 sekarang 
+      1/2/3/4 atau 5/6/7/8
+      di tentukan dari posisi 1 + 2
+    </div>
+    
+    <div class="note-card">
+      genap / ganjil dari M5
+    </div>
+    
+    <div class="note-card">
+      M4 M5 di posisi 2 dan 4
+      market ASIA/EROPA garis 2/4/6/8 
     </div>
     
   </div>
@@ -751,7 +880,22 @@ class="light-mode min-h-screen flex items-center justify-center p-4">
 <div id="timeBars"
 class="time-slider mt-2"></div>
 </div>
+<!-- FLOATING KEYPAD -->
+<div id="floatingPad" class="floating-pad">
 
+  <div id="padHeader" class="pad-header">
+
+    <span>KEYBOD</span>
+
+    <button id="hidePadBtn">
+      —
+    </button>
+
+  </div>
+
+  <div id="padBody" class="pad-body"></div>
+
+</div>
 <script>
 let m15Duration = 10 * 60;
 let timeLeft = m15Duration;
@@ -895,7 +1039,7 @@ function getCycle1Hour(){
 
 function renderTimeBars(){
 
-  const markerLabels = ['M15A','M15B','M5','M0','M1','M2','M3'];
+  const markerLabels = ['M4','M0','M5','M0','M1','M2','M3'];
 
   let numsRaw =
 expression.value
@@ -904,7 +1048,6 @@ expression.value
 
 const nums = [...numsRaw];
 
-// AUTO HITUNG SLOT KE-3
 if(nums.length >= 5){
 
   const j1  = Number(nums[0]) || 0;
@@ -1142,51 +1285,38 @@ function updateCaret(){
 
   requestAnimationFrame(() => {
 
-    fakeCaret.style.display = 'block';
+    const style = getComputedStyle(expression);
 
     const textBeforeCursor =
     expression.value.substring(0, cursorPos);
 
-    const mirror =
-    document.createElement('span');
+    const canvas =
+    updateCaret.canvas ||
+    (updateCaret.canvas =
+      document.createElement('canvas'));
 
-    const style =
-    getComputedStyle(expression);
+    const ctx =
+    canvas.getContext('2d');
 
-    mirror.style.position = 'absolute';
-    mirror.style.visibility = 'hidden';
-    mirror.style.whiteSpace = 'pre';
-    mirror.style.font = style.font;
-    mirror.style.letterSpacing =
-    style.letterSpacing;
+    ctx.font =
+      `${style.fontWeight}
+       ${style.fontSize}
+       ${style.fontFamily}`;
 
-    mirror.textContent =
-    textBeforeCursor;
+    const metrics =
+    ctx.measureText(textBeforeCursor);
 
-    document.body.appendChild(mirror);
-
-    const width =
-    mirror.getBoundingClientRect().width;
-
-    document.body.removeChild(mirror);
+    let width = metrics.width;
 
     fakeCaret.style.left =
     width + 'px';
 
-    fakeCaret.style.top = '5px';
+    fakeCaret.style.top = '4px';
 
   });
 
 }
-
 function refreshCursor(){
-
-  expression.focus();
-
-  expression.setSelectionRange(
-    cursorPos,
-    cursorPos
-  );
 
   updateCaret();
 
@@ -1462,7 +1592,7 @@ function generateResults(input){
     </div>
 
     <div>
-      <b>M15 1/2/3/4</b><br>
+      <b>M4+5 1>4 </b><br>
       ${positiveFormula}<br>
       = ${positiveTotal}
     </div>
@@ -1470,7 +1600,7 @@ function generateResults(input){
     <br>
 
     <div>
-      <b>M15 5/6/7/8</b><br>
+      <b>M4+5 5>9 </b><br>
       ${negativeFormula}<br>
       = ${negativeTotal}
     </div>
@@ -1784,12 +1914,139 @@ signalBox.onclick = () => {
   markSlotChangedByLabel('M15');
 };
 
+const floatingButtons = [
+
+  '⌫','↺',
+
+  '7','8','9',
+
+  '4','5','6',
+
+  '1','2','3',
+
+  '0','00','.'
+
+];
+
+const padBody =
+document.getElementById('padBody');
+
+floatingButtons.forEach(btn => {
+
+  const button =
+  document.createElement('button');
+
+  button.className =
+  'pad-btn';
+
+  button.innerText =
+  btn;
+
+  button.onclick = () => {
+
+    const oldBtn =
+    [...document.querySelectorAll(
+      '#buttons button'
+    )]
+    .find(v =>
+      v.innerText === btn
+    );
+
+    if(oldBtn){
+
+      oldBtn.click();
+
+    }
+
+  };
+
+  padBody.appendChild(button);
+
+});
+
+const floatingPad =
+document.getElementById(
+'floatingPad'
+);
+
+const padHeader =
+document.getElementById(
+'padHeader'
+);
+
+let dragging = false;
+
+let offsetX = 0;
+let offsetY = 0;
+
+padHeader.addEventListener(
+'pointerdown',
+e => {
+
+  dragging = true;
+  
+  offsetX =
+  e.clientX -
+  floatingPad.offsetLeft;
+
+  offsetY =
+  e.clientY -
+  floatingPad.offsetTop;
+
+}
+);
+
+document.addEventListener(
+'pointermove',
+e => {
+
+  if(!dragging) return;
+
+floatingPad.style.left =
+(e.clientX - offsetX) + 'px';
+
+floatingPad.style.top =
+(e.clientY - offsetY) + 'px';
+
+  floatingPad.style.bottom =
+  'auto';
+
+}
+);
+
+document.addEventListener(
+'pointerup',
+() => {
+
+  dragging = false;
+
+}
+);
+
+const hidePadBtn =
+document.getElementById(
+'hidePadBtn'
+);
+
+hidePadBtn.onclick = () => {
+
+  const minimized =
+  floatingPad.classList.toggle(
+    'minimized'
+  );
+
+  hidePadBtn.innerText =
+  minimized
+  ? '⌨'
+  : '×';
+
+};
+
 renderButtons();
 updateTheme();
 calculate();
 
 
 </script>
-
 </body>
 </html>
