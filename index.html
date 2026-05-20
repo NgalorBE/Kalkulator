@@ -368,7 +368,6 @@ button,
   color:#000;
 }
 
-/* LAYER ABU */
 #titleText::after{
 
   content:'RUCUP KALKULALOR';
@@ -377,116 +376,131 @@ button,
 
   inset:0;
 
-  color:#9ca3af;
-
   white-space:nowrap;
+
+background:
+linear-gradient(
+  90deg,
+
+  #ffffff 0%,
+  #f3f3f3 8%,
+
+  #00ff00 16%,
+  #00ff88 24%,
+
+  #ffffff 34%,
+  #eaeaea 40%,
+
+  #ff0000 50%,
+  #ff7b00 62%,
+  #ffd500 72%,
+
+  #ffffff 80%,
+
+  #00cfff 90%,
+  #004dff 100%
+);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+
+  background-clip:text;
+  color:transparent;
 
   clip-path:inset(0 100% 0 0);
 
   opacity:0;
 
+filter:
+drop-shadow(0 0 2px rgba(255,255,255,.25))
+drop-shadow(0 0 6px rgba(0,255,255,.15));
+
   animation:
   textSweep 7s linear infinite;
 }
 
-/* =========================
-   LOGO FLOW
-========================= */
-
 @keyframes logoSweep{
 
-  /* NORMAL */
   0%{
     transform:
     rotate(-35deg)
     translate(220%,-220%);
-
     opacity:0;
   }
 
-  /* MULAI MASUK */
   10%{
     opacity:1;
   }
 
-  /* SAPU BW */
-  35%{
+  /* SAPU */
+  32%{
     transform:
     rotate(-35deg)
     translate(20%,-20%);
-
     opacity:1;
   }
 
   /* FULL BW */
-  45%{
+  40%{
     transform:
     rotate(-35deg)
     translate(-20%,20%);
-
     opacity:1;
   }
 
-  /* TAHAN SAMPAI TEKS SELESAI */
-  72%{
+  /* TAHAN */
+  68%{
     transform:
     rotate(-35deg)
     translate(-20%,20%);
-
     opacity:1;
   }
 
-  /* DIAM 1 DETIK */
-  86%{
+  /* DIAM */
+  82%{
     transform:
     rotate(-35deg)
     translate(-20%,20%);
-
     opacity:1;
   }
 
-/* BALIK NORMAL CLASSIC */
-100%{
-  transform:
-  rotate(-35deg)
-  translate(-20%,20%);
-
-  opacity:0;
-}
+  /* FADE */
+  100%{
+    transform:
+    rotate(-35deg)
+    translate(-20%,20%);
+    opacity:0;
+  }
 
 }
-
-/* =========================
-   TEXT FLOW
-========================= */
 
 @keyframes textSweep{
 
-  /* BELUM MULAI */
+  /* HIDDEN */
   0%{
     clip-path:inset(0 100% 0 0);
-    opacity:0;
+    opacity:1;
   }
 
-  44%{
+  /* TUNGGU LOGO */
+  34%{
     clip-path:inset(0 100% 0 0);
-    opacity:0;
+    opacity:1;
   }
 
-  /* TRANSISI SETELAH LOGO */
-  58%{
+  /* LANGSUNG START SETELAH LOGO */
+  46%{
     clip-path:inset(0 0 0 0);
     opacity:1;
   }
 
-  /* FULL ABU */
-  72%{
+  /* FULL WARNA */
+  68%{
     clip-path:inset(0 0 0 0);
     opacity:1;
   }
 
-  /* DIAM 1 DETIK */
-  86%{
+  /* DIAM */
+  82%{
     clip-path:inset(0 0 0 0);
     opacity:1;
   }
