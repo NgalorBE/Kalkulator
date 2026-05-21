@@ -862,16 +862,10 @@ class="light-mode min-h-screen flex items-center justify-center p-4">
     </div>
     
     <div class="note-card">
-      1/2/3/4 atau 5/6/7/8
-      di tentukan dari posisi 1 + 2
+      PSS 1.M4 2.M5 3.OT 4.M5 5.M6
     </div>
     
     <div class="note-card">
-      genap / ganjil dari M5
-    </div>
-    
-    <div class="note-card">
-      M4 M5 di posisi 2 dan 4
       market ASIA/EROPA garis 2/4/6/8 
     </div>
     
@@ -1453,163 +1447,51 @@ function saveHistory(){
 
 function generateResults(input){
 
-  const operators = input.match(/[÷×+\-]/g);
-  const numbers = input.split(/[÷×+\-]/g);
+  try{
 
-  if(!operators) return input;
+    const operators =
+    input.match(/[÷×+\-]/g) || [];
 
-  const patterns = [
+    const numbers =
+    input
+    .split(/[÷×+\-]/g)
+    .filter(v => v !== '');
 
-    ['÷','-','+','×','÷','÷'],
-    ['×','+','-','÷','×','×'],
-    ['+','×','÷','-','+','+'],
-    ['-','÷','×','+','-','-']
-
-  ];
-
-  const formulas = patterns.map(pattern => {
-
-    let exp = '';
-
-    for(let i = 0; i < numbers.length; i++){
-
-      exp += numbers[i];
-
-      if(pattern[i]){
-        exp += pattern[i];
-      }
-
+    if(numbers.length < 5){
+      return input;
     }
 
-    return exp;
+    // posisi ke-2 = posisi ke-4
+    numbers[1] = numbers[3];
 
-  });
+    // bikin ulang hanya:
+    // 1 ÷ 6 - 12.1 + 6 × 2
+    const rebuilt =
+      `${numbers[0]}÷${numbers[1]}-${numbers[2]}+${numbers[3]}×${numbers[4]}`;
 
-  const outputs = [];
-  const allValues = [];
+    // update expression
+    expression.value = rebuilt;
 
-  formulas.forEach(exp => {
+    // hitung hasil
+    let value = eval(
+      rebuilt
+      .replace(/×/g,'*')
+      .replace(/÷/g,'/')
+    );
 
-    try{
+    // full decimal
+    value = value.toString();
 
-      let value = eval(
-        exp
-        .replace(/×/g,'*')
-        .replace(/÷/g,'/')
-      );
+    return `
+      Hasil dari rumus<br><br>
+      ${rebuilt} = ${value}
+    `;
 
-      value = Number(value.toFixed(12));
+  }catch{
 
-      outputs.push(`${exp} = ${value}`);
-
-      allValues.push(value);
-
-    }catch{
-
-      outputs.push(`${exp} = ...`);
-
-    }
-
-  });
-
-  // =========================
-  // HASIL DASAR
-  // =========================
-
-  let a = allValues[0] || 0; // ÷÷
-  let b = allValues[1] || 0; // ××
-  let c = allValues[2] || 0; // ++
-  let d = allValues[3] || 0; // --
-
-  // =========================
-  // FINAL POSITIF BARU
-  // (÷÷)×(××)+(++)-(--)÷(÷÷)
-  // =========================
-
-  let firstValue = a;
-
-  let lastDivider = Math.abs(a);
-
-  // kalau awal positif
-  // negatif dipindah ke belakang
-  if(a >= 0){
-
-    lastDivider = -Math.abs(a);
+    return '0';
 
   }
-
-  let positiveFormula =
-  `${firstValue}×${b}+${c}-${d}÷${lastDivider}`;
-
-  let positiveTotal = (
-    (firstValue * b)
-    + c
-    - (d / lastDivider)
-  );
-
-  positiveTotal =
-  Number(positiveTotal.toFixed(12));
-
-  // =========================
-  // FINAL NEGATIF BARU
-  // (--)+(++)×(××)÷(÷÷)-(--)
-  // =========================
-
-  let firstNegativeDivider =
-  Math.abs(a);
-
-  let negativeFormula =
-  `${d}+${c}×${b}÷${firstNegativeDivider}-${d}`;
-
-  let negativeTotal = (
-    d
-    + ((c * b) / firstNegativeDivider)
-    - d
-  );
-
-  negativeTotal =
-  Number(negativeTotal.toFixed(12));
-
-  // =========================
-  // OUTPUT
-  // =========================
-
-  outputs.push(`
-
-  <div style="
-    margin-top:10px;
-    padding-top:8px;
-    border-top:1px solid #555;
-    line-height:1.6;
-  ">
-
-    <div style="
-      font-size:18px;
-      font-weight:700;
-      margin-bottom:4px;
-    ">
-      Final
-    </div>
-
-    <div>
-      <b>M4+5 1>4 </b><br>
-      ${positiveFormula}<br>
-      = ${positiveTotal}
-    </div>
-
-    <br>
-
-    <div>
-      <b>M4+5 5>9 </b><br>
-      ${negativeFormula}<br>
-      = ${negativeTotal}
-    </div>
-
-  </div>
-
-  `);
-
-  return outputs.join('<br>');
 
 }
 
